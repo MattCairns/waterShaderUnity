@@ -1,12 +1,12 @@
 ﻿Shader "Custom/WaterShader" {
 	Properties {
-		_Color ("Color", Color) = (1,1,1,1)
+		_Color ("Color", Color) = (0.8,0.9,0.6,1)
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_Glossiness ("Smoothness", Range(0,1)) = 0.5
 		_Metallic ("Metallic", Range(0,1)) = 0.0
 
+		_Speed("Speed", Range(0,50)) = 0.5
 		_Amplitude ("Amplitute", Range(0,1)) = 0.5
-		_Speed ("Speed", Range(0,50)) = 0.5
 		_Wavelength ("Wavelength", Range(0,10)) = 0.5
 		_Q ("Steepness", range(0,2)) = 0.5
 	}
@@ -38,7 +38,7 @@
 		float3 gerstnerWave(float3 P, float2 D) 
 		{
 			//Gerstner waveform.  
-			float W = 2 * 3.1416 / _Wavelength;
+			float W = sqrt(9.81 * (2  * 3.1416 / _Wavelength));
 			float dotD = dot(P.xz, D);
 			float C = cos(W*dotD + _Time*_Speed);
 			float S = sin(W*dotD + _Time*_Speed);
@@ -57,11 +57,17 @@
 			float2 D1 = float2(0.75, 0.5);
 			float2 D2 = float2(0.9, 0.37);
 			float2 D3 = float2(0.62, 0.45);
-			float2 D4 = float2(0, 1);
 
-			float3 Pv0 = gerstnerWave(P0, D0) + gerstnerWave(P0, D1) + gerstnerWave(P0, D2) + gerstnerWave(P0, D2) + gerstnerWave(P0, D4);
-			float3 Pv1 = gerstnerWave(P1, D0) + gerstnerWave(P1, D1) + gerstnerWave(P1, D2) + gerstnerWave(P1, D2) + gerstnerWave(P1, D4);
-			float3 Pv2 = gerstnerWave(P2, D0) + gerstnerWave(P2, D1) + gerstnerWave(P2, D2) + gerstnerWave(P2, D2) + gerstnerWave(P2, D4);
+			float2 D4 = float2(0, 1);
+			float2 D5 = float2(0.75, 0.5);
+
+
+			float3 Pv0 = gerstnerWave(P0, D0) + gerstnerWave(P0, D1) + gerstnerWave(P0, D2) + gerstnerWave(P0, D2) + gerstnerWave(P0, D4)
+				+ gerstnerWave(P0, D5);
+			float3 Pv1 = gerstnerWave(P1, D0) + gerstnerWave(P1, D1) + gerstnerWave(P1, D2) + gerstnerWave(P1, D2) + gerstnerWave(P1, D4)
+				+ gerstnerWave(P1, D5);
+			float3 Pv2 = gerstnerWave(P2, D0) + gerstnerWave(P2, D1) + gerstnerWave(P2, D2) + gerstnerWave(P2, D2) + gerstnerWave(P2, D4)
+				+ gerstnerWave(P2, D5);
 
 			//Take the cross product to find the normal of the vertices.
 			float3 vn = cross(Pv2 - Pv0, Pv1 - Pv0);
