@@ -4,6 +4,7 @@
 		_MainTex ("Albedo (RGBA)", 2D) = "white" {}
 		_Glossiness("Smoothness", Range(0,1)) = 0.5
 		_Metallic("Metallic", Range(0,1)) = 0.0
+		_BumpMap("Bumpmap", 2D) = "bump" {}
 
 		_Speed("Large Wave Speed", Range(0,50)) = 0.5
 		_Amplitude("Large Wave Amplitute", Range(0,1)) = 0.5
@@ -35,11 +36,13 @@
 		#include "AutoLight.cginc"
 
 		sampler2D _MainTex;
+		sampler2D _BumpMap;
 		float _Amplitude, _Speed, _Wavelength, _Q;
 		float _AmplitudeSmall, _SpeedSmall, _WavelengthSmall, _QSmall;
 
 		struct Input {
 			float2 uv_MainTex;
+			float2 uv_BumpMap;
 		};
 
 		half _Glossiness;
@@ -107,6 +110,7 @@
 			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;
 			o.Alpha = c.a;
+			o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_BumpMap));
 		}
 		ENDCG
 
